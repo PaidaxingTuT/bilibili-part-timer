@@ -16,14 +16,15 @@
   var dark = isDarkMode();
 
   var C = {
-    bg:    dark ? "#303237" : "#F1F2F3",
-    bg2:   dark ? "#252528" : "#e5e5e7",
-    bg3:   dark ? "#1f1f22" : "#eaeaec",
-    text:  dark ? "#ccc"    : "#555",
-    text2: dark ? "#999"    : "#888",
-    text3: dark ? "#666"    : "#aaa",
-    line:  dark ? "#444"    : "#d5d5d7",
-    accent:"#00aeec"
+    bg:     dark ? "#303237" : "#F1F2F3",
+    bg2:    dark ? "#252528" : "#e5e5e7",
+    bg3:    dark ? "#1f1f22" : "#eaeaec",
+    text:   dark ? "#ccc"    : "#555",
+    text2:  dark ? "#999"    : "#888",
+    text3:  dark ? "#666"    : "#aaa",
+    line:   dark ? "#444"    : "#d5d5d7",
+    accent: "#00aeec",
+    border: dark ? "#555"    : "#d0d0d3"
   };
 
   function init() {
@@ -106,6 +107,8 @@
         "cursor: pointer",
         "z-index: 99999",
         "border-radius: 6px 0 0 6px",
+        "border: 1px solid " + C.border,
+        "border-right: none",
         "display: flex",
         "align-items: center",
         "justify-content: center",
@@ -126,6 +129,7 @@
         "position: fixed",
         "right: 40px",
         "top: 30%",
+        "border: 1px solid " + C.border,
         "border-radius: 8px",
         "z-index: 10000",
         "flex-direction: column",
