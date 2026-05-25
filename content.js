@@ -72,6 +72,49 @@
     }, 1000);
 
     function createUI() {
+      const ball = document.createElement("div");
+      ball.innerHTML = "🕒";
+      ball.style.cssText = `
+        position: fixed;
+        right: 0;
+        top: 30%;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        z-index: 99999;
+        border-radius: 4px 0 0 4px;
+        border: 1px solid rgba(0,174,236,0.3);
+        border-right: none;
+        background: #181818;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+      ball.style.cssText += "font-size: 18px;";
+      document.body.appendChild(ball);
+
+      const panel = document.createElement("div");
+      panel.id = "timer-panel";
+      panel.style.cssText = `
+        display: none;
+        padding: 15px;
+        width: 190px;
+        background: #181818;
+        position: fixed;
+        right: 40px;
+        top: 30%;
+        border: 1px solid #444;
+        z-index: 10000;
+        flex-direction: column;
+        gap: 12px;
+      `;
+      document.body.appendChild(panel);
+
+      ball.onclick = () => {
+        const isHidden = panel.style.display === "none";
+        panel.style.display = isHidden ? "flex" : "none";
+        ball.style.background = isHidden ? "#222" : "#181818";
+      };
     }
   }
 
