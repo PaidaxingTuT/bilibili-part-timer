@@ -13,77 +13,51 @@
     return false;
   }
 
-  var dark = isDarkMode();
-
-  var C = {
-    bg:     dark ? "#303237" : "#F1F2F3",
-    bg2:    dark ? "#252528" : "#e5e5e7",
-    bg3:    dark ? "#1f1f22" : "#eaeaec",
-    text:   dark ? "#ccc"    : "#555",
-    text2:  dark ? "#999"    : "#888",
-    text3:  dark ? "#666"    : "#aaa",
-    line:   dark ? "#444"    : "#d5d5d7",
-    accent: "#00aeec",
-    border: dark ? "#555"    : "#d0d0d3"
-  };
+  function buildColors(dark) {
+    return {
+      bg:     dark ? "#303237" : "#F1F2F3",
+      bg2:    dark ? "#252528" : "#e3e3e6",
+      bg3:    dark ? "#1f1f22" : "#e8e8eb",
+      text:   dark ? "#ccc"    : "#333",
+      text2:  dark ? "#999"    : "#555",
+      text3:  dark ? "#666"    : "#777",
+      line:   dark ? "#444"    : "#d0d0d4",
+      accent: "#00aeec",
+      border: dark ? "#555"    : "#c8c8cc",
+      shadow: dark ? "0.4"     : "0.10",
+      shadow2:dark ? "0.5"     : "0.08"
+    };
+  }
 
   function init() {
-    var css = `
-      .bili-timer-indent .video-pod__item,
-      .bili-timer-indent .list-box li,
-      .bili-timer-indent .on-demand-list-item,
-      .bili-timer-indent .click-item {
-        padding-left: 35px !important;
-        transition: padding 0.1s;
-        position: relative !important;
-        cursor: pointer !important;
-        user-select: none !important;
-      }
-
-      .bili-timer-check {
-        position: absolute !important;
-        left: 8px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        z-index: 99999 !important;
-        width: 16px !important;
-        height: 16px !important;
-        cursor: pointer;
-        accent-color: #00aeec;
-        outline: none;
-        margin: 0 !important;
-        display: block !important;
-        pointer-events: none;
-      }
-
-      #timer-panel {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        font-size: 12px;
-        border-radius: 8px;
-      }
-      #timer-panel input[type="number"] {
-        border: none;
-        color: inherit;
-        padding: 5px;
-        border-radius: 6px;
-        text-align: center;
-        outline: none;
-        font-family: monospace;
-      }
-      #timer-panel input[type="number"]:focus {
-        box-shadow: 0 0 0 1px #00aeec;
-      }
-      #timer-panel button {
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        border: none;
-        transition: 0.1s;
-      }
-      #timer-panel button:active {
-        transform: translateY(1px);
-      }
-    `;
+    var css = [
+      '.bili-timer-indent .video-pod__item,',
+      '.bili-timer-indent .list-box li,',
+      '.bili-timer-indent .on-demand-list-item,',
+      '.bili-timer-indent .click-item {',
+        'padding-left:35px!important;transition:padding .1s;position:relative!important;cursor:pointer!important;user-select:none!important;',
+      '}',
+      '.bili-timer-check {',
+        'position:absolute!important;left:8px!important;top:50%!important;transform:translateY(-50%)!important;',
+        'z-index:99999!important;width:16px!important;height:16px!important;cursor:pointer;',
+        'accent-color:#00aeec;outline:none;margin:0!important;display:block!important;pointer-events:none;',
+      '}',
+      '#timer-panel {',
+        'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:12px;border-radius:8px;',
+      '}',
+      '#timer-panel input[type="number"] {',
+        'border:none;color:inherit;padding:5px;border-radius:6px;text-align:center;outline:none;font-family:monospace;',
+      '}',
+      '#timer-panel input[type="number"]:focus {',
+        'box-shadow:0 0 0 1px #00aeec;',
+      '}',
+      '#timer-panel button {',
+        'border-radius:6px;cursor:pointer;font-weight:600;border:none;transition:.1s;',
+      '}',
+      '#timer-panel button:active {',
+        'transform:translateY(1px);',
+      '}'
+    ].join("");
     var styleTag = document.createElement("style");
     styleTag.innerHTML = css;
     document.head.appendChild(styleTag);
@@ -96,76 +70,128 @@
     }, 1000);
 
     function createUI() {
+      var dark = isDarkMode();
+      var C = buildColors(dark);
+
       var ball = document.createElement("div");
       ball.innerHTML = "🕒";
-      ball.style.cssText = [
-        "position: fixed",
-        "right: 0",
-        "top: 30%",
-        "width: 36px",
-        "height: 36px",
-        "cursor: pointer",
-        "z-index: 99999",
-        "border-radius: 6px 0 0 6px",
-        "border: 1px solid " + C.border,
-        "border-right: none",
-        "display: flex",
-        "align-items: center",
-        "justify-content: center",
-        "background: " + C.bg,
-        "color: " + C.text,
-        "box-shadow: -2px 0 8px rgba(0,0,0," + (dark ? "0.4" : "0.15") + ")"
-      ].join(";");
-      ball.style.cssText += ";font-size: 18px;";
+      ball.style.cssText = "";
       document.body.appendChild(ball);
 
       var panel = document.createElement("div");
       panel.id = "timer-panel";
-      panel.style.cssText = [
-        "display: none",
-        "padding: 15px",
-        "width: 190px",
-        "background: " + C.bg,
-        "position: fixed",
-        "right: 40px",
-        "top: 30%",
-        "border: 1px solid " + C.border,
-        "border-radius: 8px",
-        "z-index: 10000",
-        "flex-direction: column",
-        "gap: 12px",
-        "box-shadow: 0 4px 20px rgba(0,0,0," + (dark ? "0.5" : "0.12") + ")"
-      ].join(";");
+      panel.style.cssText = "";
       document.body.appendChild(panel);
 
-      panel.innerHTML = [
-        '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ' + C.line + ';padding-bottom:8px;">',
-          '<span style="font-weight:bold;color:#00aeec;">时长统计</span>',
-          '<span id="closePanel" style="cursor:pointer;color:' + C.text2 + ';font-size:14px;padding:0 5px;">✕</span>',
-        '</div>',
-        '<div style="display:flex;flex-direction:column;gap:5px;">',
-          '<div style="color:' + C.text2 + ';font-size:11px;">按集数区间</div>',
-          '<div style="display:flex;gap:5px;">',
-            '<input id="stP" type="number" placeholder="开始" style="width:100%;background:' + C.bg2 + ';color:' + C.text + ';">',
-            '<input id="edP" type="number" placeholder="结束" style="width:100%;background:' + C.bg2 + ';color:' + C.text + ';">',
-          '</div>',
-          '<button id="calcRange" style="background:' + C.bg2 + ';color:' + C.text + ';padding:6px;">计算区间时长</button>',
-        '</div>',
-        '<div style="display:flex;flex-direction:column;gap:5px;margin-top:5px;">',
-          '<button id="toggleSelect" style="background:' + C.bg2 + ';color:' + C.text2 + ';border:1px dashed ' + C.line + ';border-radius:6px;padding:8px;font-size:12px;">开启 [选择模式]</button>',
-          '<div style="font-size:10px;color:' + C.text3 + ';text-align:center;">* 支持按住左键滑动多选</div>',
-        '</div>',
-        '<div style="display:flex;align-items:center;gap:8px;margin-top:5px;border-top:1px solid ' + C.line + ';padding-top:10px;">',
-          '<span style="color:' + C.text2 + ';">倍速:</span>',
-          '<input id="spD" type="number" value="1.0" step="0.25" style="width:50px;background:' + C.bg2 + ';color:' + C.text + ';">',
-        '</div>',
-        '<div id="resultArea" style="background:' + C.bg3 + ';border-radius:6px;padding:10px;text-align:center;margin-top:5px;">',
-          '<div id="resDesc" style="color:' + C.text2 + ';font-size:11px;margin-bottom:2px;">等待操作</div>',
-          '<div id="resTime" style="color:#00aeec;font-size:16px;font-weight:bold;font-family:monospace;">00:00:00</div>',
-        '</div>'
-      ].join("");
+      var titleBar, closeBtn, stP, edP, calcBtn, toggleBtn, speedRow, spD;
+      var resultArea, resDesc, resTime;
+      var rangeLabel, toggleHint;
 
-      panel.querySelector("#closePanel").onclick = function () {
+      function rebuildPanelHTML() {
+        panel.innerHTML = [
+          '<div id="titleBar" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ' + C.line + ';padding-bottom:8px;">',
+            '<span style="font-weight:bold;color:#00aeec;">时长统计</span>',
+            '<span id="closePanel" style="cursor:pointer;color:' + C.text2 + ';font-size:14px;padding:0 5px;">✕</span>',
+          '</div>',
+          '<div style="display:flex;flex-direction:column;gap:5px;">',
+            '<span id="rangeLabel" style="color:' + C.text2 + ';font-size:11px;">按集数区间</span>',
+            '<div style="display:flex;gap:5px;">',
+              '<input id="stP" type="number" placeholder="开始" style="width:100%;background:' + C.bg2 + ';color:' + C.text + ';">',
+              '<input id="edP" type="number" placeholder="结束" style="width:100%;background:' + C.bg2 + ';color:' + C.text + ';">',
+            '</div>',
+            '<button id="calcRange" style="background:' + C.bg2 + ';color:' + C.text + ';padding:6px;">计算区间时长</button>',
+          '</div>',
+          '<div style="display:flex;flex-direction:column;gap:5px;margin-top:5px;">',
+            '<button id="toggleSelect" style="background:' + C.bg2 + ';color:' + C.text2 + ';border:1px dashed ' + C.line + ';border-radius:6px;padding:8px;font-size:12px;">开启 [选择模式]</button>',
+            '<span id="toggleHint" style="font-size:10px;color:' + C.text3 + ';text-align:center;">* 支持按住左键滑动多选</span>',
+          '</div>',
+          '<div id="speedRow" style="display:flex;align-items:center;gap:8px;margin-top:5px;border-top:1px solid ' + C.line + ';padding-top:10px;">',
+            '<span style="color:' + C.text2 + ';">倍速:</span>',
+            '<input id="spD" type="number" value="1.0" step="0.25" style="width:50px;background:' + C.bg2 + ';color:' + C.text + ';">',
+          '</div>',
+          '<div id="resultArea" style="background:' + C.bg3 + ';border-radius:6px;padding:10px;text-align:center;margin-top:5px;">',
+            '<div id="resDesc" style="color:' + C.text2 + ';font-size:11px;margin-bottom:2px;">等待操作</div>',
+            '<div id="resTime" style="color:#00aeec;font-size:16px;font-weight:bold;font-family:monospace;">00:00:00</div>',
+          '</div>'
+        ].join("");
+
+        titleBar  = panel.querySelector("#titleBar");
+        closeBtn  = panel.querySelector("#closePanel");
+        stP       = panel.querySelector("#stP");
+        edP       = panel.querySelector("#edP");
+        calcBtn   = panel.querySelector("#calcRange");
+        toggleBtn = panel.querySelector("#toggleSelect");
+        toggleHint= panel.querySelector("#toggleHint");
+        speedRow  = panel.querySelector("#speedRow");
+        spD       = panel.querySelector("#spD");
+        resultArea= panel.querySelector("#resultArea");
+        resDesc   = panel.querySelector("#resDesc");
+        resTime   = panel.querySelector("#resTime");
+        rangeLabel= panel.querySelector("#rangeLabel");
+      }
+
+      function applyBallStyle() {
+        ball.style.cssText = [
+          "position:fixed;right:0;top:30%;width:36px;height:36px;cursor:pointer;z-index:99999",
+          "border-radius:6px 0 0 6px",
+          "border:1px solid " + C.border + ";border-right:none",
+          "display:flex;align-items:center;justify-content:center",
+          "background:" + C.bg,
+          "color:" + C.text,
+          "box-shadow:-2px 0 8px rgba(0,0,0," + C.shadow + ")",
+          "font-size:18px"
+        ].join(";");
+      }
+
+      function applyPanelStyle() {
+        panel.style.cssText = [
+          "display:" + (panel.style.display === "flex" ? "flex" : "none"),
+          "padding:15px;width:190px",
+          "background:" + C.bg,
+          "position:fixed;right:40px;top:30%",
+          "border:1px solid " + C.border,
+          "border-radius:8px;z-index:10000",
+          "flex-direction:column;gap:12px",
+          "box-shadow:0 4px 20px rgba(0,0,0," + C.shadow2 + ")"
+        ].join(";");
+      }
+
+      function applyInnerStyles() {
+        if (!titleBar) return;
+        titleBar.style.borderBottomColor = C.line;
+        closeBtn.style.color = C.text2;
+        rangeLabel.style.color = C.text2;
+        stP.style.background = C.bg2; stP.style.color = C.text;
+        edP.style.background = C.bg2; edP.style.color = C.text;
+        calcBtn.style.background = C.bg2; calcBtn.style.color = C.text;
+        toggleHint.style.color = C.text3;
+        speedRow.style.borderTopColor = C.line;
+        spD.style.background = C.bg2; spD.style.color = C.text;
+        resultArea.style.background = C.bg3;
+        resDesc.style.color = C.text2;
+
+        if (!isSelectMode) {
+          toggleBtn.style.background = C.bg2;
+          toggleBtn.style.color = C.text2;
+          toggleBtn.style.border = "1px dashed " + C.line;
+        }
+      }
+
+      function refreshTheme() {
+        var newDark = isDarkMode();
+        if (newDark === dark) return;
+        dark = newDark;
+        C = buildColors(dark);
+        applyBallStyle();
+        applyPanelStyle();
+        applyInnerStyles();
+      }
+
+      rebuildPanelHTML();
+      applyBallStyle();
+      applyPanelStyle();
+
+      closeBtn.onclick = function () {
         panel.style.display = "none";
       };
 
@@ -175,6 +201,18 @@
         ball.style.background = isHidden ? C.bg2 : C.bg;
         if (isHidden) updateInfo();
       };
+
+      var observer = new MutationObserver(function () {
+        refreshTheme();
+      });
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-dark", "class"]
+      });
+
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+        refreshTheme();
+      });
 
       var isSelectMode = false;
       var listObserver = null;
@@ -207,20 +245,20 @@
       function updateInfo() {
         var data = getBiliItems();
         var currentP = new URLSearchParams(window.location.search).get("p") || 1;
-        if (!panel.querySelector("#stP").value) panel.querySelector("#stP").value = currentP;
-        if (!panel.querySelector("#edP").value) panel.querySelector("#edP").value = data.length;
+        if (!stP.value) stP.value = currentP;
+        if (!edP.value) edP.value = data.length;
       }
 
       function displayResult(label, sec, speed) {
-        panel.querySelector("#resDesc").innerText = label;
-        panel.querySelector("#resTime").innerText = formatTime(sec / speed);
+        resDesc.innerText = label;
+        resTime.innerText = formatTime(sec / speed);
       }
 
-      panel.querySelector("#calcRange").onclick = function () {
+      calcBtn.onclick = function () {
         var items = getBiliItems();
-        var start = Math.max(1, parseInt(panel.querySelector("#stP").value)) - 1;
-        var end = Math.min(items.length, parseInt(panel.querySelector("#edP").value)) - 1;
-        var speed = parseFloat(panel.querySelector("#spD").value) || 1.0;
+        var start = Math.max(1, parseInt(stP.value)) - 1;
+        var end = Math.min(items.length, parseInt(edP.value)) - 1;
+        var speed = parseFloat(spD.value) || 1.0;
         if (start > end) return;
         var totalSec = 0;
         for (var i = start; i <= end; i++) {
@@ -296,7 +334,6 @@
         });
       }
 
-      var toggleBtn = panel.querySelector("#toggleSelect");
       var listContainerSelector = ".video-pod__list, .list-box, .on-demand-list-container, .part-list";
 
       toggleBtn.onclick = function () {
@@ -333,11 +370,11 @@
           var item = cb.parentElement;
           totalSec += parseToSeconds(item.querySelector(".duration, .time").innerText.trim());
         });
-        var speed = parseFloat(panel.querySelector("#spD").value) || 1.0;
+        var speed = parseFloat(spD.value) || 1.0;
         displayResult("已勾选 " + checked.length + " 集", totalSec, speed);
       }
 
-      panel.querySelector("#spD").oninput = function () {
+      spD.oninput = function () {
         if (isSelectMode) calcCheckTotal();
       };
     }
