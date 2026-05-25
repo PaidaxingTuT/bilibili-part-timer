@@ -110,6 +110,38 @@
       `;
       document.body.appendChild(panel);
 
+      panel.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; padding-bottom:8px;">
+          <span style="font-weight:bold;">时长统计</span>
+          <span id="closePanel" style="cursor:pointer; color:#999; font-size:14px; padding:0 5px;">✕</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div style="color:#999; font-size:11px;">按集数区间</div>
+          <div style="display:flex; gap:5px;">
+            <input id="stP" type="number" placeholder="开始" style="width:100%;">
+            <input id="edP" type="number" placeholder="结束" style="width:100%;">
+          </div>
+          <button id="calcRange" style="background:#333; color:#ccc; padding:6px; border:1px solid #444;">计算区间时长</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px; margin-top:5px;">
+          <button id="toggleSelect" style="background:#222; color:#aaa; border:1px dashed #555; padding:8px; font-size:12px;">开启 [选择模式]</button>
+          <div style="font-size:10px; color:#555; text-align:center;">* 支持按住左键滑动多选</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:5px; border-top:1px solid #333; padding-top:10px;">
+          <span style="color:#999;">倍速:</span>
+          <input id="spD" type="number" value="1.0" step="0.25" style="width:50px;">
+        </div>
+        <div id="resultArea" style="background:#111; border:1px solid #333; padding:10px; text-align:center; margin-top:5px;">
+          <div id="resDesc" style="color:#999; font-size:11px; margin-bottom:2px;">等待操作</div>
+          <div id="resTime" style="color:#fff; font-size:16px; font-weight:bold; font-family:monospace;">00:00:00</div>
+        </div>
+      `;
+
+      panel.querySelector("#closePanel").onclick = () => {
+        panel.style.display = "none";
+        ball.style.background = "#181818";
+      };
+
       ball.onclick = () => {
         const isHidden = panel.style.display === "none";
         panel.style.display = isHidden ? "flex" : "none";
