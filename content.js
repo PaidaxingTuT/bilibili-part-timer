@@ -146,6 +146,172 @@
         const isHidden = panel.style.display === "none";
         panel.style.display = isHidden ? "flex" : "none";
         ball.style.background = isHidden ? "#222" : "#181818";
+        if (isHidden) updateInfo();
+      };
+
+      let isSelectMode = false;
+      let listObserver = null;
+      let isDragging = false;
+      let startDragIndex = -1;
+      let initialCheckState = false;
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+        startDragIndex = -1;
+      });
+
+      function getBiliItems() {
+        const items = Array.from(document.querySelectorAll(".video-pod__item, .list-box li, .on-demand-list-item, .click-item"));
+        return items.filter(function (item) { return item.querySelector(".duration, .time"); });
+      }
+
+      function parseToSeconds(timeStr) {
+        var parts = timeStr.split(":").reverse().map(Number);
+        return (parts[0] || 0) + (parts[1] || 0) * 60 + (parts[2] || 0) * 3600;
+      }
+
+      function formatTime(totalSec) {
+        var h = Math.floor(totalSec / 3600);
+        var m = Math.floor((totalSec % 3600) / 60);
+        var s = Math.round(totalSec % 60);
+        return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+      }
+
+      function updateInfo() {
+        var data = getBiliItems();
+        var currentP = new URLSearchParams(window.location.search).get("p") || 1;
+        if (!panel.querySelector("#stP").value) panel.querySelector("#stP").value = currentP;
+        if (!panel.querySelector("#edP").value) panel.querySelector("#edP").value = data.length;
+      }
+
+      function displayResult(label, sec, speed) {
+        panel.querySelector("#resDesc").innerText = label;
+        panel.querySelector("#resTime").innerText = formatTime(sec / speed);
+      }
+
+      panel.querySelector("#calcRange").onclick = function () {
+        var items = getBiliItems();
+        var start = Math.max(1, parseInt(panel.querySelector("#stP").value)) - 1;
+        var end = Math.min(items.length, parseInt(panel.querySelector("#edP").value)) - 1;
+        var speed = parseFloat(panel.querySelector("#spD").value) || 1.0;
+        if (start > end) return;
+        var totalSec = 0;
+        for (var i = start; i <= end; i++) {
+          totalSec += parseToSeconds(items[i].querySelector(".duration, .time").innerText.trim());
+        }
+        displayResult("区间 " + (start + 1) + "-" + (end + 1) + " 集", totalSec, speed);
+      };
+
+      function handleMouseDown(e) {
+        if (!isSelectMode) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var items = getBiliItems();
+        var currentItem = e.currentTarget;
+        startDragIndex = items.indexOf(currentItem);
+        isDragging = true;
+        var cb = currentItem.querySelector(".bili-timer-check");
+        if (cb) {
+          cb.checked = !cb.checked;
+          initialCheckState = cb.checked;
+          calcCheckTotal();
+        }
+      }
+
+      function handleMouseEnter(e) {
+        if (!isSelectMode || !isDragging) return;
+        var items = getBiliItems();
+        var currentItem = e.currentTarget;
+        var currentIndex = items.indexOf(currentItem);
+        if (startDragIndex === -1 || currentIndex === -1) return;
+        var min = Math.min(startDragIndex, currentIndex);
+        var max = Math.max(startDragIndex, currentIndex);
+        for (var i = min; i <= max; i++) {
+          var cb = items[i].querySelector(".bili-timer-check");
+          if (cb && cb.checked !== initialCheckState) {
+            cb.checked = initialCheckState;
+          }
+        }
+        calcCheckTotal();
+      }
+
+      function interceptClick(e) {
+        if (isSelectMode) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
+      }
+
+      function attachListeners() {
+        var items = getBiliItems();
+        items.forEach(function (item) {
+          if (!item.querySelector(".bili-timer-check")) {
+            var cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.className = "bili-timer-check";
+            item.prepend(cb);
+            item.addEventListener("mousedown", handleMouseDown);
+            item.addEventListener("mouseenter", handleMouseEnter);
+            item.addEventListener("click", interceptClick, true);
+          }
+        });
+      }
+
+      function detachListeners() {
+        var items = getBiliItems();
+        items.forEach(function (item) {
+          var cb = item.querySelector(".bili-timer-check");
+          if (cb) cb.remove();
+          item.removeEventListener("mousedown", handleMouseDown);
+          item.removeEventListener("mouseenter", handleMouseEnter);
+          item.removeEventListener("click", interceptClick, true);
+        });
+      }
+
+      var toggleBtn = panel.querySelector("#toggleSelect");
+      var listContainerSelector = ".video-pod__list, .list-box, .on-demand-list-container, .part-list";
+
+      toggleBtn.onclick = function () {
+        isSelectMode = !isSelectMode;
+        var containers = document.querySelectorAll(listContainerSelector);
+
+        if (isSelectMode) {
+          toggleBtn.innerText = "关闭 [选择模式]";
+          toggleBtn.style.background = "#444";
+          toggleBtn.style.color = "#fff";
+          toggleBtn.style.borderStyle = "solid";
+          containers.forEach(function (c) { c.classList.add("bili-timer-indent"); });
+          attachListeners();
+          if (containers.length > 0) {
+            listObserver = new MutationObserver(function () { attachListeners(); });
+            containers.forEach(function (c) { listObserver.observe(c, { childList: true, subtree: true }); });
+          }
+        } else {
+          toggleBtn.innerText = "开启 [选择模式]";
+          toggleBtn.style.background = "#222";
+          toggleBtn.style.color = "#aaa";
+          toggleBtn.style.borderStyle = "dashed";
+          if (listObserver) { listObserver.disconnect(); listObserver = null; }
+          containers.forEach(function (c) { c.classList.remove("bili-timer-indent"); });
+          detachListeners();
+          displayResult("准备就绪", 0, 1);
+        }
+      };
+
+      function calcCheckTotal() {
+        var checked = document.querySelectorAll(".bili-timer-check:checked");
+        var totalSec = 0;
+        checked.forEach(function (cb) {
+          var item = cb.parentElement;
+          totalSec += parseToSeconds(item.querySelector(".duration, .time").innerText.trim());
+        });
+        var speed = parseFloat(panel.querySelector("#spD").value) || 1.0;
+        displayResult("已勾选 " + checked.length + " 集", totalSec, speed);
+      }
+
+      panel.querySelector("#spD").oninput = function () {
+        if (isSelectMode) calcCheckTotal();
       };
     }
   }
