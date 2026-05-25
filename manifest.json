@@ -1,7 +1,11 @@
 {
   "manifest_version": 3,
   "name": "B站分P时长统计",
+<<<<<<< HEAD
   "version": "2.0",
+=======
+  "version": "0.1",
+>>>>>>> 60558dbe9ae187962227c2f1178842b7a535aed9
   "description": "B站分P视频时长统计",
   "icons": {
     "16": "icon.png",
