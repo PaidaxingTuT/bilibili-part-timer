@@ -1,8 +1,33 @@
 (function () {
   "use strict";
 
+  function isDarkMode() {
+    if (document.documentElement.getAttribute("data-dark") === "true") return true;
+    if (document.documentElement.classList.contains("dark")) return true;
+    var bg = getComputedStyle(document.body).backgroundColor;
+    var m = bg.match(/\d+/g);
+    if (m && m.length >= 3) {
+      var avg = (parseInt(m[0]) + parseInt(m[1]) + parseInt(m[2])) / 3;
+      return avg < 128;
+    }
+    return false;
+  }
+
+  var dark = isDarkMode();
+
+  var C = {
+    bg:    dark ? "#303237" : "#F1F2F3",
+    bg2:   dark ? "#252528" : "#e5e5e7",
+    bg3:   dark ? "#1f1f22" : "#eaeaec",
+    text:  dark ? "#ccc"    : "#555",
+    text2: dark ? "#999"    : "#888",
+    text3: dark ? "#666"    : "#aaa",
+    line:  dark ? "#444"    : "#d5d5d7",
+    accent:"#00aeec"
+  };
+
   function init() {
-    const css = `
+    var css = `
       .bili-timer-indent .video-pod__item,
       .bili-timer-indent .list-box li,
       .bili-timer-indent .on-demand-list-item,
@@ -23,7 +48,7 @@
         width: 16px !important;
         height: 16px !important;
         cursor: pointer;
-        accent-color: #fb7299;
+        accent-color: #00aeec;
         outline: none;
         margin: 0 !important;
         display: block !important;
@@ -33,13 +58,11 @@
       #timer-panel {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         font-size: 12px;
-        color: #e0e0e0;
         border-radius: 8px;
       }
       #timer-panel input[type="number"] {
-        background: #36363a;
-        border: 1px solid #555;
-        color: #fff;
+        border: none;
+        color: inherit;
         padding: 5px;
         border-radius: 6px;
         text-align: center;
@@ -47,7 +70,7 @@
         font-family: monospace;
       }
       #timer-panel input[type="number"]:focus {
-        border-color: #fb7299;
+        box-shadow: 0 0 0 1px #00aeec;
       }
       #timer-panel button {
         border-radius: 6px;
@@ -60,11 +83,11 @@
         transform: translateY(1px);
       }
     `;
-    const styleTag = document.createElement("style");
+    var styleTag = document.createElement("style");
     styleTag.innerHTML = css;
     document.head.appendChild(styleTag);
 
-    const checkExist = setInterval(() => {
+    var checkExist = setInterval(function () {
       if (document.querySelector(".duration, .time")) {
         clearInterval(checkExist);
         createUI();
@@ -72,97 +95,96 @@
     }, 1000);
 
     function createUI() {
-      const ball = document.createElement("div");
+      var ball = document.createElement("div");
       ball.innerHTML = "🕒";
-      ball.style.cssText = `
-        position: fixed;
-        right: 0;
-        top: 30%;
-        width: 36px;
-        height: 36px;
-        cursor: pointer;
-        z-index: 99999;
-        border-radius: 6px 0 0 6px;
-        border: 2px solid rgba(251,114,153,0.45);
-        border-right: none;
-        background: #2d2d30;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      `;
-      ball.style.cssText += "font-size: 18px;";
+      ball.style.cssText = [
+        "position: fixed",
+        "right: 0",
+        "top: 30%",
+        "width: 36px",
+        "height: 36px",
+        "cursor: pointer",
+        "z-index: 99999",
+        "border-radius: 6px 0 0 6px",
+        "display: flex",
+        "align-items: center",
+        "justify-content: center",
+        "background: " + C.bg,
+        "color: " + C.text,
+        "box-shadow: -2px 0 8px rgba(0,0,0," + (dark ? "0.4" : "0.15") + ")"
+      ].join(";");
+      ball.style.cssText += ";font-size: 18px;";
       document.body.appendChild(ball);
 
-      const panel = document.createElement("div");
+      var panel = document.createElement("div");
       panel.id = "timer-panel";
-      panel.style.cssText = `
-        display: none;
-        padding: 15px;
-        width: 190px;
-        background: #2d2d30;
-        position: fixed;
-        right: 40px;
-        top: 30%;
-        border: 1px solid #555;
-        border-radius: 8px;
-        z-index: 10000;
-        flex-direction: column;
-        gap: 12px;
-      `;
+      panel.style.cssText = [
+        "display: none",
+        "padding: 15px",
+        "width: 190px",
+        "background: " + C.bg,
+        "position: fixed",
+        "right: 40px",
+        "top: 30%",
+        "border-radius: 8px",
+        "z-index: 10000",
+        "flex-direction: column",
+        "gap: 12px",
+        "box-shadow: 0 4px 20px rgba(0,0,0," + (dark ? "0.5" : "0.12") + ")"
+      ].join(";");
       document.body.appendChild(panel);
 
-      panel.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #444; padding-bottom:8px;">
-          <span style="font-weight:bold; color:#fff;">时长统计</span>
-          <span id="closePanel" style="cursor:pointer; color:#bbb; font-size:14px; padding:0 5px;">✕</span>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:5px;">
-          <div style="color:#bbb; font-size:11px;">按集数区间</div>
-          <div style="display:flex; gap:5px;">
-            <input id="stP" type="number" placeholder="开始" style="width:100%;">
-            <input id="edP" type="number" placeholder="结束" style="width:100%;">
-          </div>
-          <button id="calcRange" style="background:#3d3d42; color:#ddd; padding:6px; border:1px solid #555; border-radius:6px;">计算区间时长</button>
-        </div>
-        <div style="display:flex; flex-direction:column; gap:5px; margin-top:5px;">
-          <button id="toggleSelect" style="background:#36363a; color:#bbb; border:1px dashed #666; border-radius:6px; padding:8px; font-size:12px;">开启 [选择模式]</button>
-          <div style="font-size:10px; color:#666; text-align:center;">* 支持按住左键滑动多选</div>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:5px; border-top:1px solid #444; padding-top:10px;">
-          <span style="color:#bbb;">倍速:</span>
-          <input id="spD" type="number" value="1.0" step="0.25" style="width:50px;">
-        </div>
-        <div id="resultArea" style="background:#222228; border:1px solid #444; border-radius:6px; padding:10px; text-align:center; margin-top:5px;">
-          <div id="resDesc" style="color:#bbb; font-size:11px; margin-bottom:2px;">等待操作</div>
-          <div id="resTime" style="color:#fff; font-size:16px; font-weight:bold; font-family:monospace;">00:00:00</div>
-        </div>
-      `;
+      panel.innerHTML = [
+        '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ' + C.line + ';padding-bottom:8px;">',
+          '<span style="font-weight:bold;color:#00aeec;">时长统计</span>',
+          '<span id="closePanel" style="cursor:pointer;color:' + C.text2 + ';font-size:14px;padding:0 5px;">✕</span>',
+        '</div>',
+        '<div style="display:flex;flex-direction:column;gap:5px;">',
+          '<div style="color:' + C.text2 + ';font-size:11px;">按集数区间</div>',
+          '<div style="display:flex;gap:5px;">',
+            '<input id="stP" type="number" placeholder="开始" style="width:100%;background:' + C.bg2 + ';color:' + C.text + ';">',
+            '<input id="edP" type="number" placeholder="结束" style="width:100%;background:' + C.bg2 + ';color:' + C.text + ';">',
+          '</div>',
+          '<button id="calcRange" style="background:' + C.bg2 + ';color:' + C.text + ';padding:6px;">计算区间时长</button>',
+        '</div>',
+        '<div style="display:flex;flex-direction:column;gap:5px;margin-top:5px;">',
+          '<button id="toggleSelect" style="background:' + C.bg2 + ';color:' + C.text2 + ';border:1px dashed ' + C.line + ';border-radius:6px;padding:8px;font-size:12px;">开启 [选择模式]</button>',
+          '<div style="font-size:10px;color:' + C.text3 + ';text-align:center;">* 支持按住左键滑动多选</div>',
+        '</div>',
+        '<div style="display:flex;align-items:center;gap:8px;margin-top:5px;border-top:1px solid ' + C.line + ';padding-top:10px;">',
+          '<span style="color:' + C.text2 + ';">倍速:</span>',
+          '<input id="spD" type="number" value="1.0" step="0.25" style="width:50px;background:' + C.bg2 + ';color:' + C.text + ';">',
+        '</div>',
+        '<div id="resultArea" style="background:' + C.bg3 + ';border-radius:6px;padding:10px;text-align:center;margin-top:5px;">',
+          '<div id="resDesc" style="color:' + C.text2 + ';font-size:11px;margin-bottom:2px;">等待操作</div>',
+          '<div id="resTime" style="color:#00aeec;font-size:16px;font-weight:bold;font-family:monospace;">00:00:00</div>',
+        '</div>'
+      ].join("");
 
-      panel.querySelector("#closePanel").onclick = () => {
+      panel.querySelector("#closePanel").onclick = function () {
         panel.style.display = "none";
-        ball.style.background = "#2d2d30";
       };
 
-      ball.onclick = () => {
-        const isHidden = panel.style.display === "none";
+      ball.onclick = function () {
+        var isHidden = panel.style.display === "none";
         panel.style.display = isHidden ? "flex" : "none";
-        ball.style.background = isHidden ? "#3d3d40" : "#2d2d30";
+        ball.style.background = isHidden ? C.bg2 : C.bg;
         if (isHidden) updateInfo();
       };
 
-      let isSelectMode = false;
-      let listObserver = null;
-      let isDragging = false;
-      let startDragIndex = -1;
-      let initialCheckState = false;
+      var isSelectMode = false;
+      var listObserver = null;
+      var isDragging = false;
+      var startDragIndex = -1;
+      var initialCheckState = false;
 
-      document.addEventListener("mouseup", () => {
+      document.addEventListener("mouseup", function () {
         isDragging = false;
         startDragIndex = -1;
       });
 
       function getBiliItems() {
-        const items = Array.from(document.querySelectorAll(".video-pod__item, .list-box li, .on-demand-list-item, .click-item"));
+        var items = Array.from(document.querySelectorAll(".video-pod__item, .list-box li, .on-demand-list-item, .click-item"));
         return items.filter(function (item) { return item.querySelector(".duration, .time"); });
       }
 
@@ -279,10 +301,9 @@
 
         if (isSelectMode) {
           toggleBtn.innerText = "关闭 [选择模式]";
-          toggleBtn.style.background = "#fb7299";
+          toggleBtn.style.background = "#00aeec";
           toggleBtn.style.color = "#fff";
-          toggleBtn.style.borderStyle = "solid";
-          toggleBtn.style.borderColor = "#fb7299";
+          toggleBtn.style.border = "none";
           containers.forEach(function (c) { c.classList.add("bili-timer-indent"); });
           attachListeners();
           if (containers.length > 0) {
@@ -291,10 +312,9 @@
           }
         } else {
           toggleBtn.innerText = "开启 [选择模式]";
-          toggleBtn.style.background = "#36363a";
-          toggleBtn.style.color = "#bbb";
-          toggleBtn.style.borderStyle = "dashed";
-          toggleBtn.style.borderColor = "#666";
+          toggleBtn.style.background = C.bg2;
+          toggleBtn.style.color = C.text2;
+          toggleBtn.style.border = "1px dashed " + C.line;
           if (listObserver) { listObserver.disconnect(); listObserver = null; }
           containers.forEach(function (c) { c.classList.remove("bili-timer-indent"); });
           detachListeners();
