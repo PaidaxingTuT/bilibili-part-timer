@@ -23,7 +23,7 @@
         width: 16px !important;
         height: 16px !important;
         cursor: pointer;
-        accent-color: #00aeec;
+        accent-color: #fb7299;
         outline: none;
         margin: 0 !important;
         display: block !important;
@@ -33,24 +33,24 @@
       #timer-panel {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         font-size: 12px;
-        color: #ddd;
-        border-radius: 2px;
+        color: #e0e0e0;
+        border-radius: 8px;
       }
       #timer-panel input[type="number"] {
-        background: #222;
-        border: 1px solid #444;
+        background: #36363a;
+        border: 1px solid #555;
         color: #fff;
         padding: 5px;
-        border-radius: 2px;
+        border-radius: 6px;
         text-align: center;
         outline: none;
         font-family: monospace;
       }
       #timer-panel input[type="number"]:focus {
-        border-color: #00aeec;
+        border-color: #fb7299;
       }
       #timer-panel button {
-        border-radius: 2px;
+        border-radius: 6px;
         cursor: pointer;
         font-weight: 600;
         border: none;
@@ -82,10 +82,10 @@
         height: 36px;
         cursor: pointer;
         z-index: 99999;
-        border-radius: 4px 0 0 4px;
-        border: 1px solid rgba(0,174,236,0.3);
+        border-radius: 6px 0 0 6px;
+        border: 2px solid rgba(251,114,153,0.45);
         border-right: none;
-        background: #181818;
+        background: #2d2d30;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -99,11 +99,12 @@
         display: none;
         padding: 15px;
         width: 190px;
-        background: #181818;
+        background: #2d2d30;
         position: fixed;
         right: 40px;
         top: 30%;
-        border: 1px solid #444;
+        border: 1px solid #555;
+        border-radius: 8px;
         z-index: 10000;
         flex-direction: column;
         gap: 12px;
@@ -111,41 +112,41 @@
       document.body.appendChild(panel);
 
       panel.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333; padding-bottom:8px;">
-          <span style="font-weight:bold;">时长统计</span>
-          <span id="closePanel" style="cursor:pointer; color:#999; font-size:14px; padding:0 5px;">✕</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #444; padding-bottom:8px;">
+          <span style="font-weight:bold; color:#fff;">时长统计</span>
+          <span id="closePanel" style="cursor:pointer; color:#bbb; font-size:14px; padding:0 5px;">✕</span>
         </div>
         <div style="display:flex; flex-direction:column; gap:5px;">
-          <div style="color:#999; font-size:11px;">按集数区间</div>
+          <div style="color:#bbb; font-size:11px;">按集数区间</div>
           <div style="display:flex; gap:5px;">
             <input id="stP" type="number" placeholder="开始" style="width:100%;">
             <input id="edP" type="number" placeholder="结束" style="width:100%;">
           </div>
-          <button id="calcRange" style="background:#333; color:#ccc; padding:6px; border:1px solid #444;">计算区间时长</button>
+          <button id="calcRange" style="background:#3d3d42; color:#ddd; padding:6px; border:1px solid #555; border-radius:6px;">计算区间时长</button>
         </div>
         <div style="display:flex; flex-direction:column; gap:5px; margin-top:5px;">
-          <button id="toggleSelect" style="background:#222; color:#aaa; border:1px dashed #555; padding:8px; font-size:12px;">开启 [选择模式]</button>
-          <div style="font-size:10px; color:#555; text-align:center;">* 支持按住左键滑动多选</div>
+          <button id="toggleSelect" style="background:#36363a; color:#bbb; border:1px dashed #666; border-radius:6px; padding:8px; font-size:12px;">开启 [选择模式]</button>
+          <div style="font-size:10px; color:#666; text-align:center;">* 支持按住左键滑动多选</div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-top:5px; border-top:1px solid #333; padding-top:10px;">
-          <span style="color:#999;">倍速:</span>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:5px; border-top:1px solid #444; padding-top:10px;">
+          <span style="color:#bbb;">倍速:</span>
           <input id="spD" type="number" value="1.0" step="0.25" style="width:50px;">
         </div>
-        <div id="resultArea" style="background:#111; border:1px solid #333; padding:10px; text-align:center; margin-top:5px;">
-          <div id="resDesc" style="color:#999; font-size:11px; margin-bottom:2px;">等待操作</div>
+        <div id="resultArea" style="background:#222228; border:1px solid #444; border-radius:6px; padding:10px; text-align:center; margin-top:5px;">
+          <div id="resDesc" style="color:#bbb; font-size:11px; margin-bottom:2px;">等待操作</div>
           <div id="resTime" style="color:#fff; font-size:16px; font-weight:bold; font-family:monospace;">00:00:00</div>
         </div>
       `;
 
       panel.querySelector("#closePanel").onclick = () => {
         panel.style.display = "none";
-        ball.style.background = "#181818";
+        ball.style.background = "#2d2d30";
       };
 
       ball.onclick = () => {
         const isHidden = panel.style.display === "none";
         panel.style.display = isHidden ? "flex" : "none";
-        ball.style.background = isHidden ? "#222" : "#181818";
+        ball.style.background = isHidden ? "#3d3d40" : "#2d2d30";
         if (isHidden) updateInfo();
       };
 
@@ -278,9 +279,10 @@
 
         if (isSelectMode) {
           toggleBtn.innerText = "关闭 [选择模式]";
-          toggleBtn.style.background = "#444";
+          toggleBtn.style.background = "#fb7299";
           toggleBtn.style.color = "#fff";
           toggleBtn.style.borderStyle = "solid";
+          toggleBtn.style.borderColor = "#fb7299";
           containers.forEach(function (c) { c.classList.add("bili-timer-indent"); });
           attachListeners();
           if (containers.length > 0) {
@@ -289,9 +291,10 @@
           }
         } else {
           toggleBtn.innerText = "开启 [选择模式]";
-          toggleBtn.style.background = "#222";
-          toggleBtn.style.color = "#aaa";
+          toggleBtn.style.background = "#36363a";
+          toggleBtn.style.color = "#bbb";
           toggleBtn.style.borderStyle = "dashed";
+          toggleBtn.style.borderColor = "#666";
           if (listObserver) { listObserver.disconnect(); listObserver = null; }
           containers.forEach(function (c) { c.classList.remove("bili-timer-indent"); });
           detachListeners();
