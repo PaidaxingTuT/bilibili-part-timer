@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B站分P时长统计</title>
+<style>
+  :root {
+    --bg: #fff;
+    --text: #333;
+    --text-secondary: #666;
+    --border: #e5e5e5;
+    --code-bg: #f5f5f5;
+    --accent: #00a1d6;
+    --tag-bg: #e8f7fb;
+    --tag-text: #00a1d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1a;
+      --text: #ddd;
+      --text-secondary: #999;
+      --border: #333;
+      --code-bg: #252525;
+      --accent: #00b5e5;
+      --tag-bg: #1a3a44;
+      --tag-text: #00b5e5;
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.8;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  h2 { font-size: 20px; font-weight: 600; margin: 40px 0 12px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; }
+
+  .subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; }
+
+  .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  ul { margin: 8px 0 16px 20px; }
+  li { margin-bottom: 6px; }
+  li > ul { margin: 4px 0 4px 16px; }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .step {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 24px;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 500px) {
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+
+  .feature-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .feature-card h3 { margin-top: 0; }
+
+  .note {
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 4px 4px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 16px 0;
+  }
+
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  .notion-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+  }
+  .notion-table th, .notion-table td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 14px;
+  }
+  .notion-table th {
+    background: var(--code-bg);
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<h1>B站分P时长统计</h1>
+<p class="subtitle">Chrome 浏览器扩展 —— 快速计算 B站多分P视频的总时长，支持区间计算、勾选统计和倍速换算。</p>
+
+<p>
+  <span class="tag">Chrome 扩展</span>
+  <span class="tag">Manifest V3</span>
+  <span class="tag">无需额外权限</span>
+  <span class="tag">开源</span>
+</p>
+
+<h2>它能做什么</h2>
+
+<div class="feature-grid">
+  <div class="feature-card">
+    <h3>区间计算</h3>
+    <p>输入起止分P编号，一键算出该区间内所有视频的总时长。</p>
+  </div>
+  <div class="feature-card">
+    <h3>勾选模式</h3>
+    <p>勾选/取消单个分P，支持拖拽批量选择，实时统计选中时长。</p>
+  </div>
+  <div class="feature-card">
+    <h3>倍速换算</h3>
+    <p>设定播放倍速（1.25x / 1.5x / 2x），自动换算实际观看耗时。</p>
+  </div>
+  <div class="feature-card">
+    <h3>日夜模式适配</h3>
+    <p>跟随 B站页面的深色/浅色主题自动切换，无需手动设置。</p>
+  </div>
+</div>
+
+<h2>适用场景</h2>
+<ul>
+  <li>看系列课程/教程前，预估全部看完需要多长时间</li>
+  <li>追剧或番剧时，了解剩余集数的总时长</li>
+  <li>挑选若干单集观看，快速计算所选内容的耗时</li>
+  <li>倍速看视频时，换算真实需要的时间</li>
+</ul>
+
+<h2>安装方法</h2>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div>下载 <a href="https://github.com/AmaneKanata/bilibili-part-timer/releases">最新版本</a> 的 <code>bilibili-part-timer.zip</code> 并解压到一个文件夹。</div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div>打开 Chrome，地址栏输入 <code>chrome://extensions</code>，右上角打开「开发者模式」。</div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div>点击「加载已解压的扩展程序」，选择刚才解压的文件夹。</div>
+</div>
+<div class="step">
+  <div class="step-num">4</div>
+  <div>完成。打开任意 B站分P视频页面即可看到右侧的时钟按钮。</div>
+</div>
+
+<h2>使用方法</h2>
+
+<h3>基础操作</h3>
+<ul>
+  <li>打开任意 B站分P视频（如课程、番剧、合集），页面右侧会出现一个时钟图标按钮。</li>
+  <li>点击按钮展开统计面板。</li>
+</ul>
+
+<h3>区间计算</h3>
+<ul>
+  <li>在「起始分P」和「结束分P」输入框中填入编号。</li>
+  <li>默认已填入当前播放分P和总分P数。</li>
+  <li>点击「计算区间时长」，结果以 <code>HH:MM:SS</code> 格式显示。</li>
+</ul>
+
+<h3>勾选模式</h3>
+<ul>
+  <li>点击「选择模式」按钮开启。</li>
+  <li>每个分P左侧出现复选框，勾选需要统计的分P。</li>
+  <li>支持拖拽批量勾选：按住一个复选框并拖过其他项。</li>
+  <li>实时显示已选分P数量和总时长。</li>
+  <li>再次点击「选择模式」关闭。</li>
+</ul>
+
+<h3>倍速换算</h3>
+<ul>
+  <li>在「播放倍速」输入框中设定倍速（默认 1.0，步进 0.25）。</li>
+  <li>计算结果自动除以倍速，显示的是实际观看所需时间。</li>
+</ul>
+
+<div class="note">
+  <strong>提示：</strong>扩展仅在你打开 B站视频页面（<code>*.bilibili.com/video/*</code>）时生效，无需任何权限，不会收集任何数据。
+</div>
+
+<h2>兼容性说明</h2>
+
+<table class="notion-table">
+  <tr><th>浏览器</th><th>支持</th></tr>
+  <tr><td>Chrome</td><td>完全支持</td></tr>
+  <tr><td>Edge</td><td>完全支持（基于 Chromium）</td></tr>
+  <tr><td>Arc / Brave / 其他 Chromium 内核</td><td>可用，未专门测试</td></tr>
+  <tr><td>Firefox</td><td>暂不支持（Manifest V3 兼容中）</td></tr>
+</table>
+
+<h2>常见问题</h2>
+
+<h3>为什么打开B站视频没看到按钮？</h3>
+<ul>
+  <li>确认页面是视频详情页（URL 包含 <code>/video/</code>）。</li>
+  <li>确认该视频包含多个分P，单P视频无需统计时长。</li>
+  <li>检查扩展是否已启用：<code>chrome://extensions</code> 中确保开关为开启状态。</li>
+</ul>
+
+<h3>按钮挡住了页面内容怎么办？</h3>
+<ul>
+  <li>按钮只占极窄的一条边缘区域，面板在展开后固定宽度 190px。</li>
+  <li>如果确实遮挡，可以暂时收起面板，只在需要计算时打开。</li>
+</ul>
+
+<h3>时长统计不准？</h3>
+<ul>
+  <li>时长数据直接读取B站页面上的显示值。如果B站页面显示的时长本身就存在舍入误差（通常 ±1 秒），计算结果也会有同样的偏差。</li>
+</ul>
+
+<div class="footer">
+  <p>B站分P时长统计 &mdash; 一个轻量的 Chrome 扩展，用最简单的方式帮你计算视频观看时间。</p>
+  <p style="margin-top:8px"><a href="https://github.com/AmaneKanata/bilibili-part-timer">GitHub</a> &middot; <a href="https://github.com/AmaneKanata/bilibili-part-timer/issues">反馈问题</a></p>
+</div>
+
+</body>
+</html>
